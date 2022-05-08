@@ -6,78 +6,58 @@ using UnityEngine.Animations;
 
 public class BaseDoorScript : MonoBehaviour
 {
-    public bool doorOpen;
-    public int amountOfLocksOnDoor;
-    public GameObject[] doorLocks;
-    public Animator animator;
-    
-    public GameController GC;
+    public GameController gameController;
+    public GameObject MiddleDoorPosition;
+    private bool doorUnlocked = false;
 
-    public GameObject roomObject;
-    public Animator roomAnimator;
-    public List<GameObject> ActiveLocksForDoor = new List<GameObject>();
+    public GameObject[] possibleLocksForDoor;
+    private int amountofLocksForDoor;
+    public int locksUnlocked;
+
+    private Animator doorAnimator;
+    public BaseRoomScript topParentObjectScript;
+    public GameObject topParentObject;
+
     // Start is called before the first frame update
     void Start()
     {
-        //numberOfLocks = doorLocks.Length;
-        //StartCoroutine(SpawnLocks());
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        doorAnimator = transform.GetChild(0).gameObject.GetComponent<Animator>();
+        amountofLocksForDoor = Random.Range(1,4);
+        SpawnLocks();
+        //SetVariables();
+    }
+
+    private void SpawnLocks()
+    {
+        for(int i = 0; i < amountofLocksForDoor; i++)
+        {
+            int lockChoice = Random.Range(1, possibleLocksForDoor.Length);
+            GameObject TempLock = Object.Instantiate(possibleLocksForDoor[lockChoice], new Vector3(0f, 0f, 0f), possibleLocksForDoor[lockChoice].transform.rotation,transform.GetChild(0));
+            TempLock.transform.localPosition = new Vector3(MiddleDoorPosition.transform.localPosition.x, MiddleDoorPosition.transform.localPosition.y + Random.Range(-0.5f,0.5f), MiddleDoorPosition.transform.localPosition.z);
+            TempLock = null;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(amountOfLocksOnDoor <= 0 && doorOpen != true) {
-            doorOpen = true;
-            Debug.Log("Welcome to hell bitch, enjoy your stay.");
-            animator.SetBool("DoorOpen", true);
-            StartCoroutine(GC.NextRoom(roomObject));
-            StartCoroutine(NewDoor());
+        if(locksUnlocked == amountofLocksForDoor && doorUnlocked == false)
+        {
+            doorUnlocked = true;
+            unlockDoor();
+            Debug.Log("Woah I'm open");
         }
     }
 
-    public IEnumerator SpawnLocks() {
-        amountOfLocksOnDoor = Random.Range(1, doorLocks.Length);
-        Debug.Log("Number of Locks for this door is: " + amountOfLocksOnDoor);
-        for (int i = 0; i < amountOfLocksOnDoor; i++) {
-            Debug.Log("i @ Start of loop is: " + i);
-            int LockToSpawn = Random.Range(0, doorLocks.Length);
-            if(doorLocks[LockToSpawn].activeSelf == false) {
-                doorLocks[LockToSpawn].SetActive(true);
-                ActiveLocksForDoor.Add(doorLocks[LockToSpawn]);
-            } else {
-                i--;
-            }
-            Debug.Log("Looping");
-            yield return new WaitForSeconds(0f);
-        }
+    void unlockDoor()
+    {
+        doorAnimator.SetBool("DoorOpen", true);
+        gameController.ChangeRooms();
     }
 
-    public void RefreshLocks() {
-        if(ActiveLocksForDoor.Count > 0) {
-            for (int i = 0; i < ActiveLocksForDoor.Count; i++) {
-                ActiveLocksForDoor[i].SetActive(false);
-            }
-            ActiveLocksForDoor.Clear();
-            amountOfLocksOnDoor = 0;
-        }
-    }
-
-    public IEnumerator NewDoor () {
-        yield return new WaitForSeconds(0.6f);
-        roomAnimator.SetBool("OriginToEnd", false);
-        roomAnimator.SetBool("SpawnToOrigin", false);
-        yield return new WaitForSeconds(1.5f);
-        animator.SetBool("CloseDoor",true);
-        animator.SetBool("DoorOpen", false);
-        yield return new WaitForSeconds(0.35f);
-        animator.SetBool("CloseDoor", false);
-        amountOfLocksOnDoor = 0;
-        for (int i = 0; i < ActiveLocksForDoor.Count; i++) {
-            ActiveLocksForDoor[i].SetActive(false);
-        }
-        ActiveLocksForDoor.Clear();
-        //StartCoroutine(SpawnLocks());
-        doorOpen = false;
-        roomObject.GetComponent<BaseRoomScript>().NewDoor();
+    public void SetVariables()
+    {
+        gameController.CurrentRoom = topParentObject;
     }
 }

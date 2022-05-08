@@ -4,37 +4,59 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    public GameObject roomOne;
-    public BaseRoomScript roomOneScript;
-    public GameObject roomTwo;
-    public BaseRoomScript roomTwoScript;
+    //Room Variables
+    public GameObject roomBase;
+    public GameObject CurrentRoom;
+    public GameObject OldRoom;
+
+    //room position variables
+    public GameObject RoomSpawnPoint;
+    public GameObject RoomMoveEndPoint;
 
     // Start is called before the first frame update
     void Start()
     {
-        roomOneScript = roomOne.GetComponent<BaseRoomScript>();
-        roomTwoScript = roomTwo.GetComponent<BaseRoomScript>();
-        roomOne.GetComponent<Animator>().SetBool("SpawnToOrigin", true);
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            Physics.Raycast(ray, out hit);
+
+            if (hit.transform.gameObject != null)
+            {
+                if (hit.transform.gameObject.CompareTag("Lock") == true)
+                {
+                    hit.transform.gameObject.GetComponent<BaseLockScript>().UnLock();
+                    //Debug.Log("Found a lock");
+                }
+                else
+                {
+                    Debug.Log("That ain't a lock");
+                }
+            }
+        }
     }
 
-    public IEnumerator NextRoom(GameObject FinishedRoom) {
-        yield return new WaitForSeconds(0.45f);
-        if(FinishedRoom.name == roomOne.name) {
-            yield return new WaitForSeconds(0.6f);
-            roomOne.GetComponent<Animator>().SetBool("OriginToEnd", true);
-            roomTwo.GetComponent<Animator>().SetBool("SpawnToOrigin", true);
-            StartCoroutine(roomOneScript.doorForRoomScript.NewDoor());
-        } else if(FinishedRoom.name == roomTwo.name) {
-            yield return new WaitForSeconds(0.6f);
-            roomTwo.GetComponent<Animator>().SetBool("OriginToEnd", true);
-            roomOne.GetComponent<Animator>().SetBool("SpawnToOrigin", true);
-            StartCoroutine(roomTwoScript.doorForRoomScript.NewDoor());
-        }
+    public void ChangeRooms()
+    {
+        CurrentRoom.transform.GetComponent<Animator>().SetBool("RoomMayMove",true);
+        StartCoroutine(DoorUnlockedAnimationEnd());
+        OldRoom = CurrentRoom;
+        CurrentRoom = Object.Instantiate(roomBase, RoomSpawnPoint.transform.position, RoomSpawnPoint.transform.rotation);
+    }
+
+
+    public IEnumerator DoorUnlockedAnimationEnd()
+    {
+        yield return new WaitForSeconds(2.5f);
+        //gameController.ChangeRooms();
+        Destroy(OldRoom);
     }
 }
