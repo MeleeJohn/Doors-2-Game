@@ -46,17 +46,19 @@ public class GameController : MonoBehaviour
 
     public void ChangeRooms()
     {
-        CurrentRoom.transform.GetComponent<Animator>().SetBool("RoomMayMove",true);
-        StartCoroutine(DoorUnlockedAnimationEnd());
-        OldRoom = CurrentRoom;
-        CurrentRoom = Object.Instantiate(roomBase, RoomSpawnPoint.transform.position, RoomSpawnPoint.transform.rotation);
+        //CurrentRoom.transform.GetComponent<Animator>().SetBool("RoomMayMove",true);
+        //StartCoroutine(DoorUnlockedAnimationEnd());
+        Object.Instantiate(roomBase, RoomSpawnPoint.transform.position, RoomSpawnPoint.transform.rotation);
     }
 
 
     public IEnumerator DoorUnlockedAnimationEnd()
     {
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(0f);
+        //OldRoom = CurrentRoom;
+        CurrentRoom = Object.Instantiate(roomBase, RoomSpawnPoint.transform.position, RoomSpawnPoint.transform.rotation);
+        //yield return new WaitForSeconds(1.5f);
         //gameController.ChangeRooms();
-        Destroy(OldRoom);
+        //Destroy(OldRoom);
     }
 }

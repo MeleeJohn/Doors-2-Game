@@ -45,15 +45,24 @@ public class BaseDoorScript : MonoBehaviour
         if(locksUnlocked == amountofLocksForDoor && doorUnlocked == false)
         {
             doorUnlocked = true;
-            unlockDoor();
+            StartCoroutine(unlockDoor());
             Debug.Log("Woah I'm open");
         }
     }
 
-    void unlockDoor()
+    private IEnumerator unlockDoor()
     {
-        doorAnimator.SetBool("DoorOpen", true);
+
+        topParentObject.GetComponent<Animator>().SetBool("RoomMayMove", true);
+        Debug.Log("Moving Room");
+        //gameController.ChangeRooms();
+        yield return new WaitForSeconds(1f);
+        Debug.Log("Changing Room and opening door");
         gameController.ChangeRooms();
+        doorAnimator.SetBool("DoorOpen", true);
+        yield return new WaitForSeconds(1.5f);
+        Debug.Log("Destroying Room");
+        Destroy(topParentObject);
     }
 
     public void SetVariables()
