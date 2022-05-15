@@ -23,7 +23,7 @@ public class BaseDoorScript : MonoBehaviour
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         doorAnimator = transform.GetChild(0).gameObject.GetComponent<Animator>();
-        amountofLocksForDoor = Random.Range(1,4);
+        amountofLocksForDoor = Random.Range(1,10);
         SpawnLocks();
         //SetVariables();
     }
@@ -52,7 +52,7 @@ public class BaseDoorScript : MonoBehaviour
 
     private IEnumerator unlockDoor()
     {
-
+        gameController.Score++;
         topParentObject.GetComponent<Animator>().SetBool("RoomMayMove", true);
         Debug.Log("Moving Room");
         //gameController.ChangeRooms();
@@ -68,5 +68,10 @@ public class BaseDoorScript : MonoBehaviour
     public void SetVariables()
     {
         gameController.CurrentRoom = topParentObject;
+    }
+
+    public void newLockLocation(GameObject lockToMove)
+    {
+        lockToMove.transform.localPosition = new Vector3(0f, MiddleDoorPosition.transform.localPosition.y + Random.Range(-0.25f, 0.5f), MiddleDoorPosition.transform.localPosition.z);
     }
 }

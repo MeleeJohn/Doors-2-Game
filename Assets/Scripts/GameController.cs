@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class GameController : MonoBehaviour
     //room position variables
     public GameObject RoomSpawnPoint;
     public GameObject RoomMoveEndPoint;
+
+    //Scoring
+    public int Score;
+    public TextMeshProUGUI scoreText;
 
     // Start is called before the first frame update
     void Start()
@@ -42,6 +47,8 @@ public class GameController : MonoBehaviour
                 }
             }
         }
+
+        scoreText.text = Score.ToString();
     }
 
     public void ChangeRooms()

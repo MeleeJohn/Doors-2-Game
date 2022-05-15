@@ -12,7 +12,6 @@ public class BaseLockScript : MonoBehaviour
 
     void Start()
     {
-
         DoorParent = transform.parent.gameObject.transform.parent.gameObject.transform.parent.gameObject;
         DoorParentScript = DoorParent.GetComponent<BaseDoorScript>();
     }
@@ -32,4 +31,15 @@ public class BaseLockScript : MonoBehaviour
             Debug.Log("Hey you unlocked me");
         }
     }
+
+    public void OnTriggerStay(Collider collidee)
+    {
+        if(collidee.gameObject.tag == "Lock")
+        {
+            DoorParentScript.newLockLocation(this.gameObject);
+            Debug.Log("Gotta move lock");
+        }
+    }
+
+
 }
